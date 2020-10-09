@@ -1,0 +1,5 @@
+var usuarios = '{"usuarios":[' +
+    '{"Nombre":"Cliente1","dirIP":"192.168.1.1", "usuarios":[{"Nombre":"root","Grupo":"root"},{"Nombre":"jhonny","Grupo":"jhonny", "OtrosGrupos":["amigos","trabajo"]},{"Nombre":"pablo","Grupo":"pablo"}, {"Nombre":"juan","Grupo":"juan"}, {"Nombre":"daniel","Grupo":"daniel"}]],' +
+    '{"Nombre":"root","Grupo":"root"},{"Nombre":"jhonny","Grupo":"jhonny"},{"Nombre":"pablo","Grupo":"pablo"}, {"Nombre":"andres","Grupo":"andres"}, {"Nombre":"maria","Grupo":"maria"},' +
+    '{"Nombre":"root","Grupo":"root"},{"Nombre":"jhonny","Grupo":"jhonny"},{"Nombre":"pablo","Grupo":"pablo"}, {"Nombre":"julian","Grupo":"julian"}, {"Nombre":"camilo","Grupo":"camilo"},' +
+    '{"Nombre":"root","Grupo":"root"},{"Nombre":"jhonny","Grupo":"jhonny"},{"Nombre":"pablo","Grupo":"pablo"}, {"Nombre":"carlos","Grupo":"carlos"}, {"Nombre":"nestor","Grupo":"nestor"}]]}';
