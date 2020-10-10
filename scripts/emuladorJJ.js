@@ -183,7 +183,9 @@ function login(e) {
     }
 }
 
-
+/**
+ * Funcion que permite cerrar la sesion
+ */
 function cerrarSesion() {
     $('#loginDiv').show();
     objSistema.maquinaActual = null;
