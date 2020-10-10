@@ -43,10 +43,20 @@
       </div>
       <div class="row justify-content-md-center">
         <div class="col col-lg-10 bg-dark text-white" style="margin: 0px;border-color: #343a40;height:200px;overflow: auto;" id="consola">
-            <div class="bg-dark text-white" style="border-color: #343a40;" id="textoImprimir">Login: jhonnysp
+            <div class="form-inline" id="loginDiv">
+              <span id="spanLogin">Login:</span>
+              <input class="form-control bg-dark text-white" style="box-shadow: none; border-color: #343a40;" type="text" value="" id="login" onkeypress="login(event);">
             </div>
-            <div class="form-inline">
-              <span>jhonnysp$</span><input class="form-control bg-dark text-white" style="box-shadow: none; border-color: #343a40;" type="text" value="" id="entrada" onkeypress="procesarEntrada(event);">
+            
+            <div id="divLoginMensaje">
+              <span id="spanLoginMensaje"></span>
+            </div>
+
+            <div class="bg-dark text-white" style="border-color: #343a40;" id="textoImprimir">
+            </div>
+
+            <div class="form-inline" id="divComandos">
+              <span id="prompt"></span><input class="form-control bg-dark text-white" style="box-shadow: none; border-color: #343a40;" type="text" value="" id="entrada" onkeypress="procesarEntrada(event);">
             </div>
         </div>
       </div>
