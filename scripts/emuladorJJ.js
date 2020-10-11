@@ -109,7 +109,6 @@ $(document).ready(function(){
         }
       
     }
-*/
 
     for (x in objSistema.sistema) {
         for (j in objSistema.sistema[x].disco) {
@@ -251,16 +250,29 @@ function consultarIndiceMaquina(maquina) {
     return null;
 }
 
+/**
+ * Funcion que permite listar un con ls los archivos del disco
+ */
 function procesarListar() {
     var indiceMaquina = consultarIndiceMaquina(objSistema.maquinaActual);
     
     for (x in objSistema.sistema[indiceMaquina].disco) {
         document.getElementById( "textoImprimir" ).innerHTML += objSistema.sistema[indiceMaquina].disco[x].nombre + "       ";
-    }   
+    }  
 }
 
 
-
+function procesarListarLs() {
+    var indiceMaquina = consultarIndiceMaquina(objSistema.maquinaActual);
+    
+    for (x in objSistema.sistema[indiceMaquina].disco) {
+        document.getElementById( "textoImprimir" ).innerHTML += objSistema.sistema[indiceMaquina].disco[x].permiso + "&emsp;&emsp;&emsp;"
+                                                                + objSistema.sistema[indiceMaquina].usuarios[objSistema.sistema[indiceMaquina].disco[x].propietario] + "&emsp;&emsp;&emsp;"
+                                                                + objSistema.sistema[indiceMaquina].grupoNom[objSistema.sistema[indiceMaquina].disco[x].grupo] + "&emsp;&emsp;&emsp;"
+                                                                + objSistema.sistema[indiceMaquina].disco[x].fecha + "&emsp;&emsp;&emsp;"
+                                                                + objSistema.sistema[indiceMaquina].disco[x].nombre + "<br>";
+    }   
+}
 
 
 /**
@@ -292,7 +304,12 @@ function procesarComando ( comando ) {
         // ...
 
         case 'ls':
-            procesarListar();
+            if (comandoParametros[1] == '-l') {
+                procesarListarLs();
+            }else{
+                procesarListar();    
+            }
+            
             break;
 
         default:
