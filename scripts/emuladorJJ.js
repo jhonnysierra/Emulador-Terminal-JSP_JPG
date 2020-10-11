@@ -88,8 +88,8 @@ var maquinas = '{"maquinas":[' +
 
     ']}'; 
 
-    var objMaquinas = JSON.parse(maquinas);
-    var objSistema = JSON.parse(sistema);
+var objMaquinas = JSON.parse(maquinas);
+var objSistema = JSON.parse(sistema);
 
 $(document).ready(function(){
     entrada.disabled = true;
@@ -166,7 +166,7 @@ function login(e) {
 
         if (busqueda) {
             entrada.disabled = false;
-
+            $('#divComandos').show();
             $('#loginDiv').hide();
             loginMensaje.innerHTML = "";
             textoLogin.value = "";
@@ -226,13 +226,41 @@ function addConsola ( texto ) {
  */
 function foco()
 {
-    if (!loginDiv.disabled) {
+    if ($('#loginDiv').is(":visible")) {
         textoLogin.focus();
     } else {
         entrada.focus();
     }
     
 }
+
+/**
+ * Consulta el indice de la maquina actual
+ *
+ * @param      {<type>}  maquina  The maquina
+ * @return     {<type>}  { description_of_the_return_value }
+ objSistema.sistema[x].nombre*/
+function consultarIndiceMaquina(maquina) {
+    for (x in objSistema.sistema) {
+        if (objSistema.sistema[x].nombre == maquina) {
+            return x;
+            break;
+        }
+    }
+
+    return null;
+}
+
+function procesarListar() {
+    var indiceMaquina = consultarIndiceMaquina(objSistema.maquinaActual);
+    
+    for (x in objSistema.sistema[indiceMaquina].disco) {
+        document.getElementById( "textoImprimir" ).innerHTML += objSistema.sistema[indiceMaquina].disco[x].nombre + "       ";
+    }   
+}
+
+
+
 
 
 /**
@@ -263,6 +291,10 @@ function procesarComando ( comando ) {
             break;
         // ...
 
+        case 'ls':
+            procesarListar();
+            break;
+
         default:
             addConsola ( "bash: comando no reconocido: " + comandoParametros[0] );
     }
@@ -280,5 +312,18 @@ function procesarClear ( comandoParametros ) {
     } else {
         limpiarConsola();
     }
+
+function procesarTouch(argument) {
+    // body...
+}
+
+
+
+function verificarPermisos(cadena) {
+    // body...
+}
+
+
+
 }
 
