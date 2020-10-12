@@ -246,8 +246,119 @@ function consultarIndiceMaquina(maquina) {
             break;
         }
     }
-
     return null;
+}
+
+/**
+ * Verifica si existe un archivo en el disco de la maquina
+ *
+ * @param      {String}   archivo  Nombre del archivo
+ * @return     {boolean}  { description_of_the_return_value }
+ */
+function buscarArchivo(archivo) {
+    var indiceMaquina = consultarIndiceMaquina(objSistema.maquinaActual);
+
+    for (x in objSistema.sistema[indiceMaquina].disco) {
+        if (objSistema.sistema[indiceMaquina].disco[x].nombre == archivo) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * Funcion para consultar el indice de un archivo en el arreglo de disco de la maquina
+ *
+ * @param      {<type>}  archivo  The archivo
+ * @return     {<type>}  { description_of_the_return_value }
+ */
+function consultarIndiceArchivo(archivo) {
+    var indiceMaquina = consultarIndiceMaquina(objSistema.maquinaActual);
+
+    for (x in objSistema.sistema[indiceMaquina].disco) {
+        console.log(objSistema.sistema[indiceMaquina].disco[x]);
+        if (objSistema.sistema[indiceMaquina].disco[x].nombre == archivo) {
+            return x;
+        }
+    }
+    return null;
+}
+
+/**
+ * Funcion para consultar el indice de un usuarios en la maquina actual
+ *
+ * @param      {String}  usuario  The usuario
+ * @return     {<type>}  { description_of_the_return_value }
+ */
+function consultarIndiceUsuario(usuario) {
+    var indiceMaquina = consultarIndiceMaquina(objSistema.maquinaActual);
+
+    for (x in objSistema.sistema[indiceMaquina].usuarios) {
+        if (objSistema.sistema[indiceMaquina].usuarios[x] == usuario) {
+            return x;
+            break;
+        }
+    }
+    return null;
+}
+
+function verificarPerteneceGrupo(indiceMaquina, usuario, grupo) {
+    for (x in objSistema.sistema[indiceMaquina].grupos[grupo]) {
+        if (objSistema.sistema[indiceMaquina].grupos[grupo][x] == usuario) {
+                return true;
+                break;
+        }
+    }
+    return false;
+}
+
+function verificarPermisosLectura(indiceMaquina, indiceUsuario, grupo, permiso) {
+    permisoGrupo = permiso.charAt(4);
+    permisoOtros = permiso.charAt(7);
+
+    console.log("Grupo: " + permisoGrupo + " Otros: " + permisoOtros);
+
+    if (verificarPerteneceGrupo(indiceMaquina, indiceUsuario, grupo)) {
+        if (permisoGrupo == "r") {
+            console.log("permisos por grupo");
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    if (permisoOtros == "r") {
+        console.log("permisos por otros");
+        return true;
+    }
+
+    return false;
+}
+
+function procesarCat(archivo) {
+    var indiceUsuario = consultarIndiceUsuario(objSistema.usuarioActual);
+    var indiceMaquina = consultarIndiceMaquina(objSistema.maquinaActual);
+    var indiceArchivo = consultarIndiceArchivo(archivo);
+    
+    if (buscarArchivo(archivo)) {
+        var propietario = objSistema.sistema[indiceMaquina].disco[indiceArchivo].propietario;
+        var permiso = objSistema.sistema[indiceMaquina].disco[indiceArchivo].permiso;
+        var grupo = objSistema.sistema[indiceMaquina].disco[indiceArchivo].grupo;
+
+        if (propietario == indiceUsuario) {
+            addConsola("cat: " + archivo + ": Leyendo el contenido del archivo...");
+        }else{
+            if (verificarPermisosLectura(indiceMaquina, indiceUsuario, grupo, permiso)) {
+                addConsola("cat: " + archivo + ": Leyendo el contenido del archivo...");  
+            } else {
+                addConsola("cat: " + archivo + ": No tiene permiso para leer el archivo");
+            } 
+        }
+         
+    } else {
+       addConsola("cat: " + archivo + ": No existe el archivo o el directorio"); 
+    }
 }
 
 /**
@@ -257,8 +368,9 @@ function procesarListar() {
     var indiceMaquina = consultarIndiceMaquina(objSistema.maquinaActual);
     
     for (x in objSistema.sistema[indiceMaquina].disco) {
-        document.getElementById( "textoImprimir" ).innerHTML += objSistema.sistema[indiceMaquina].disco[x].nombre + "       ";
-    }  
+        document.getElementById( "textoImprimir" ).innerHTML += objSistema.sistema[indiceMaquina].disco[x].nombre + "&emsp;&emsp;&emsp;";
+    }
+    document.getElementById( "textoImprimir" ).innerHTML += "<br>";
 }
 
 
@@ -291,7 +403,7 @@ function procesarEntrada( e ) {
 function procesarComando ( comando ) {
 	var comandoParametros = comando.value.split(" ");
 
-	//addConsola ( "carloseg@ventas$ " );
+	addConsola (objSistema.usuarioActual + "@" + objSistema.maquinaActual + " $");
 
     switch ( comandoParametros[0] ){
         case 'clear': 
@@ -306,10 +418,17 @@ function procesarComando ( comando ) {
         case 'ls':
             if (comandoParametros[1] == '-l') {
                 procesarListarLs();
+            }else if(comandoParametros[1] == null){
+                procesarListar();
             }else{
-                procesarListar();    
+                addConsola ( "bash: parametro no reconocido: " + comandoParametros[1] );
             }
-            
+            break;
+
+        case 'cat':
+            if (comandoParametros[1] != null) {
+                procesarCat(comandoParametros[1]);    
+            }
             break;
 
         default:
@@ -334,11 +453,6 @@ function procesarTouch(argument) {
     // body...
 }
 
-
-
-function verificarPermisos(cadena) {
-    // body...
-}
 
 
 
