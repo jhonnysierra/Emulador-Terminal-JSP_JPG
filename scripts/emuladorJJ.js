@@ -460,9 +460,7 @@ function procesarTouch(archivo) {
     var indiceArchivo = consultarIndiceArchivo(archivo);
 
     var longitudDisco = objSistema.sistema[indiceMaquina].disco.length;
-    var propietario = objSistema.sistema[indiceMaquina].disco[indiceArchivo].propietario;
-    var permiso = objSistema.sistema[indiceMaquina].disco[indiceArchivo].permiso;
-    var grupo = objSistema.sistema[indiceMaquina].disco[indiceArchivo].grupo;
+
 
     var fechaActual = new Date();
     var cadenaFecha = fechaActual.toString();
@@ -470,8 +468,13 @@ function procesarTouch(archivo) {
 
     if (!buscarArchivo(archivo)) {
         objSistema.sistema[indiceMaquina].disco.push({"permiso":"-rw-r-----", "propietario":indiceUsuario, "grupo":indiceUsuario,"fecha":"08-apr-2019", "nombre":archivo});
+        console.log(objSistema.sistema[indiceMaquina].disco[indiceArchivo]);
 
     } else {
+        var propietario = objSistema.sistema[indiceMaquina].disco[indiceArchivo].propietario;
+        var permiso = objSistema.sistema[indiceMaquina].disco[indiceArchivo].permiso;
+        var grupo = objSistema.sistema[indiceMaquina].disco[indiceArchivo].grupo;
+
         if (propietario == indiceUsuario) {
             if (verificarPermisosUsuarioW(permiso)) {
                 objSistema.sistema[indiceMaquina].disco[indiceArchivo].fecha = fechaArchivo[2] + "-" + fechaArchivo[1] + "-" + fechaArchivo[3];
