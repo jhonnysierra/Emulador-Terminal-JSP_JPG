@@ -420,37 +420,50 @@ function procesarCat(archivo) {
                 addConsola("cat: " + archivo + ": No tiene permiso para leer el archivo");
             } 
         }
-
     } else {
      addConsola("cat: " + archivo + ": No existe el archivo o el directorio"); 
- }
+    }
 }
 
-
+/**
+ * Verifica si un propietario tiene permisos de lectura
+ *
+ * @param      {string}   permiso  Permiso del archivo
+ * @return     {boolean}  True si tiene permiso de lectura, false si no
+ */
 function verificarPermisosUsuarioR(permiso) {
     var permisoUsuario = permiso.charAt(1);
     if (permisoUsuario == "r") {
         return true;   
     }
-
     return false;
 }
 
+/**
+ * Verifica si un propietario tiene permisos de escritura
+ *
+ * @param      {string}   permiso  Permiso del archivo
+ * @return     {boolean}  True si tiene permiso de escritura, false si no
+ */
 function verificarPermisosUsuarioW(permiso) {
     var permisoUsuario = permiso.charAt(2);
     if (permisoUsuario == "w") {
         return true;   
     }
-
     return false;
 }
 
+/**
+ * Verifica si un propietario tiene permisos de ejecucion
+ *
+ * @param      {string}   permiso  Permiso del archivo
+ * @return     {boolean}  True si tiene permiso de escritura, false si no
+ */
 function verificarPermisosUsuarioX(permiso) {
     var permisoUsuario = permiso.charAt(3);
     if (permisoUsuario == "x") {
         return true;   
     }
-
     return false;
 }
 
@@ -468,8 +481,6 @@ function procesarTouch(archivo) {
 
     if (!buscarArchivo(archivo)) {
         objSistema.sistema[indiceMaquina].disco.push({"permiso":"-rw-r-----", "propietario":indiceUsuario, "grupo":indiceUsuario,"fecha":"08-apr-2019", "nombre":archivo});
-        console.log(objSistema.sistema[indiceMaquina].disco[indiceArchivo]);
-
     } else {
         var propietario = objSistema.sistema[indiceMaquina].disco[indiceArchivo].propietario;
         var permiso = objSistema.sistema[indiceMaquina].disco[indiceArchivo].permiso;
@@ -488,15 +499,14 @@ function procesarTouch(archivo) {
                 addConsola("bash: touch: " + " El usuario no tiene permisos de escritura");
             }
         }
-       //addConsola("touch: " + archivo + ": El archivo ya se encuentra en el disco");
- }    
+    }    
 }
 
 /**
  * Funcion para cambiar los permisos del propietario y grupo
  *
- * @param      {<type>}  archivo           The archivo
- * @param      {<type>}  propietarioGrupo  The propietario grupo
+ * @param      {<type>}  archivo           Nombre del archivo
+ * @param      {<type>}  propietarioGrupo  Cadena con propietario:grupo
  */
 function procesarChown(archivo, propietarioGrupo) {
     var indiceUsuario = consultarIndiceUsuario(propietarioGrupo[0]);
@@ -522,7 +532,12 @@ function procesarChown(archivo, propietarioGrupo) {
     }
 }
 
-
+/**
+ * Funcion que permite procesar el comando chmod para cambiar los permisos de un archivo
+ *
+ * @param      {string}  permiso  Permiso en formato numerico
+ * @param      {string}  archivo  Nombre del archivo
+ */
 function procesarChmod(permiso, archivo) {
     var indiceMaquina = consultarIndiceMaquina(objSistema.maquinaActual);
     var indiceArchivo = consultarIndiceArchivo(archivo);
@@ -533,10 +548,48 @@ function procesarChmod(permiso, archivo) {
     }else{
         addConsola("bash: chmod: " + " El archivo no existe");
     }
-
 }
+
 /**
- * Funcion que permite listar un con ls los archivos del disco
+ * Funcion que permite procesar el comando ejecutar
+ *
+ * @param      {string}  archivo  The archivo
+ */
+function procesarEjecutar(archivo) {
+    var indiceUsuario = consultarIndiceUsuario(objSistema.usuarioActual);
+    var indiceMaquina = consultarIndiceMaquina(objSistema.maquinaActual);
+    var indiceArchivo = consultarIndiceArchivo(archivo);
+    var extensionArchivo = archivo.substring(archivo.length -3, archivo.length);
+
+    if (buscarArchivo(archivo)) {
+        if (extensionArchivo == ".sh") {
+            var propietario = objSistema.sistema[indiceMaquina].disco[indiceArchivo].propietario;
+            var permiso = objSistema.sistema[indiceMaquina].disco[indiceArchivo].permiso;
+            var grupo = objSistema.sistema[indiceMaquina].disco[indiceArchivo].grupo;
+
+            if (propietario == indiceUsuario) {
+                if (verificarPermisosUsuarioX(permiso)) {
+                    addConsola("bash: ./: " + " Ejecutando archivo" + archivo);
+                }else{
+                    addConsola("bash: ./: " + " El usuario no tiene permisos de ejecucion");
+                }
+            }else{
+                if (verificarPermisosEjecucion(indiceMaquina, indiceUsuario, grupo, permiso)) {
+                    addConsola("bash: ./: " + " Ejecutando archivo " + archivo);
+                }else{
+                    addConsola("bash: ./: " + " El usuario no tiene permisos de ejecucion");
+                }
+            } 
+        } else {
+            addConsola("bash: ./: " + archivo + ": El archivo no es ejecutable");
+        }
+    } else {
+        addConsola("bash: " + archivo + ": El archivo no existe");
+    }  
+}
+
+/**
+ * Funcion que permite procesar comando ls
  */
  function procesarListar() {
     var indiceMaquina = consultarIndiceMaquina(objSistema.maquinaActual);
@@ -547,7 +600,9 @@ function procesarChmod(permiso, archivo) {
     document.getElementById( "textoImprimir" ).innerHTML += "<br>";
 }
 
-
+/**
+ * Funcion que permite procesar el comando ls -l
+ */
 function procesarListarLs() {
     var indiceMaquina = consultarIndiceMaquina(objSistema.maquinaActual);
     
@@ -574,96 +629,103 @@ function procesarListarLs() {
  * Procesa el comando enviado como argumento.
  * @param comando a procesar
  */
- function procesarComando ( comando ) {
+function procesarComando ( comando ) {
    var comandoParametros = comando.value.split(" ");
 
    addConsola (objSistema.usuarioActual + "@" + objSistema.maquinaActual + " $");
 
-   switch ( comandoParametros[0] ){
-        case 'clear': 
-            procesarClear( comandoParametros );
-            break;
+   comandoExe = comandoParametros[0].substring(0, 2);
+   archivoExe = comandoParametros[0].substring(2, comandoParametros[0].length);
 
-        case 'logout':
-            cerrarSesion();
-            break;
-        // ...
+    if (comandoExe == './') {
+        procesarEjecutar(archivoExe);
+    }else{
+       switch ( comandoParametros[0] ){
+            case 'clear': 
+                procesarClear( comandoParametros );
+                break;
 
-        case 'ls':
-            if (comandoParametros[1] == '-l') {
-                procesarListarLs();
-            }else if(comandoParametros[1] == null){
-                procesarListar();
-            }else{
-                addConsola ( "bash: parametro no reconocido: " + comandoParametros[1] );
-            }
-            break;
+            case 'logout':
+                cerrarSesion();
+                break;
 
-        case 'cat':
-            if (comandoParametros[1] != null) {
-                procesarCat(comandoParametros[1]);    
-            }else{
-                addConsola ( "bash: El comando cat necesita un parametro" );
-            }
-            break;
-
-        case 'touch':
-            if (comandoParametros[1] != null) {
-                procesarTouch(comandoParametros[1]);    
-            }else{
-                addConsola ( "bash: El comando touch necesita un parametro" );
-            }
-            break;
-        
-        case 'sudo':
-            if (comandoParametros[1] != null) {
-                if (comandoParametros[1] == "chown") {
-                    propietarioGrupo = comandoParametros[2].split(":");
-                    if (propietarioGrupo[0]!='' && propietarioGrupo[1]!='') {
-                        if (comandoParametros[3]!="") {
-                            procesarChown(comandoParametros[3], propietarioGrupo);
-                        }else{
-                            addConsola ( "bash: El comando chown necesita parametros" );    
-                        }
-
-                    } else {
-                        addConsola ( "bash: El comando chown necesita parametros" );
-                    }
-                } else if(comandoParametros[1] == "chmod"){
-                    if (isNaN(comandoParametros[2]) == false) {
-                        if (comandoParametros[2].length==3) {
-                            procesarChmod(comandoParametros[2], comandoParametros[3]);
-                        } else {
-                            addConsola ( "bash: chmod: El permiso no es válido" );
-                        }
-                    } else {
-                        addConsola ( "bash: chmod: Se necesita números como parametro" );
-                    }
+            case 'ls':
+                if (comandoParametros[1] == '-l') {
+                    procesarListarLs();
+                }else if(comandoParametros[1] == null){
+                    procesarListar();
+                }else{
+                    addConsola ( "bash: parametro no reconocido: " + comandoParametros[1] );
                 }
-            }else{
-                addConsola ( "bash: El comando sudo necesita parametros" );
-            }
-            break;
+                break;
 
-        case 'nano':
-            if (comandoParametros[1] != null) {
-                procesarNano(comandoParametros[1]);    
-            }else{
-                addConsola ( "bash: El comando nano necesita un parametro" );
-            }
-            break;
+            case 'cat':
+                if (comandoParametros[1] != null) {
+                    procesarCat(comandoParametros[1]);    
+                }else{
+                    addConsola ( "bash: El comando cat necesita un parametro" );
+                }
+                break;
 
-        case 'rm':
-            if (comandoParametros[1] != null) {
-                procesarRm(comandoParametros[1]);    
-            }else{
-                addConsola ( "bash: El comando rm necesita un parametro" );
-            }
-            break;            
+            case 'touch':
+                if (comandoParametros[1] != null) {
+                    procesarTouch(comandoParametros[1]);    
+                }else{
+                    addConsola ( "bash: El comando touch necesita un parametro" );
+                }
+                break;
+            
+            case 'sudo':
+                if (comandoParametros[1] != null) {
+                    if (comandoParametros[1] == "chown") {
+                        propietarioGrupo = comandoParametros[2].split(":");
+                        if (propietarioGrupo[0]!='' && propietarioGrupo[1]!='') {
+                            if (comandoParametros[3]!="") {
+                                procesarChown(comandoParametros[3], propietarioGrupo);
+                            }else{
+                                addConsola ( "bash: El comando chown necesita parametros" );    
+                            }
 
-        default:
-            addConsola ( "bash: comando no reconocido: " + comandoParametros[0] );
+                        } else {
+                            addConsola ( "bash: El comando chown necesita parametros" );
+                        }
+                    } else if(comandoParametros[1] == "chmod"){
+                        if (isNaN(comandoParametros[2]) == false) {
+                            if (comandoParametros[2].length==3) {
+                                procesarChmod(comandoParametros[2], comandoParametros[3]);
+                            } else {
+                                addConsola ( "bash: chmod: El permiso no es válido" );
+                            }
+                        } else {
+                            addConsola ( "bash: chmod: Se necesita números como parametro" );
+                        }
+                    }
+                }else{
+                    addConsola ( "bash: El comando sudo necesita parametros" );
+                }
+                break;
+
+            case 'nano':
+                if (comandoParametros[1] != null) {
+                    procesarNano(comandoParametros[1]);    
+                }else{
+                    addConsola ( "bash: El comando nano necesita un parametro" );
+                }
+                break;
+
+            case 'rm':
+                if (comandoParametros[1] != null) {
+                    procesarRm(comandoParametros[1]);    
+                }else{
+                    addConsola ( "bash: El comando rm necesita un parametro" );
+                }
+                break;
+
+            default:
+                addConsola ( "bash: comando no reconocido: " + comandoParametros[0] );
+        }
     }
+
 
     //addConsola ( "" );
     document.getElementById( "entrada" ).value = "";
