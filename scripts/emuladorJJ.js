@@ -17,74 +17,74 @@
  var textoLogin = document.getElementById( "login" );
  var prontLogin = document.getElementById( "prompt" );
  var divComandos = document.getElementById( "divComandos" );
-
+ var permisosChmod = ["---", "--x", "-w-", "-wx", "r--", "r-x", "rw-", "rwx"];
 
 
  var maquinas = '{"maquinas":[' +
- '{"Nombre":"Cliente1","dirIP":"192.168.1.1" },' +
- '{"Nombre":"Cliente2","dirIP":"192.168.1.2" },' +
- '{"Nombre":"Cliente3","dirIP":"192.168.1.3" },' +
- '{"Nombre":"Cliente4","dirIP":"192.168.1.4" }]}';
+     '{"Nombre":"Cliente1","dirIP":"192.168.1.1" },' +
+     '{"Nombre":"Cliente2","dirIP":"192.168.1.2" },' +
+     '{"Nombre":"Cliente3","dirIP":"192.168.1.3" },' +
+     '{"Nombre":"Cliente4","dirIP":"192.168.1.4" }]}'; 
 
  var sistema = '{'+
- '"maquinaActual": null,'+
- '"usuarioActual": null,'+
- '"sistema":[' +
- '{'+
- '"nombre":"Cliente1",'+
- '"dirIP":"192.168.1.1",'+
- '"usuarios":["root","jhonny","pablo","juan","daniel"],'+
- /* Grupos: "root","jhonny","pablo","juan","daniel","amigos","trabajo" */
- '"grupoNom":["root","jhonny","pablo","juan","daniel","amigos","trabajo"],'+
- '"grupos":[["0"],["1"],["2"],["3"],["4"],["0","1","2"],["0","3","4"]],'+
- '"disco":[{"permiso":"-rw-r-----", "propietario":1, "grupo":1,"fecha":"18-oct-2020", "nombre":"carta.txt"},'+
- '{"permiso":"-rw-r-----", "propietario":2, "grupo":2,"fecha":"17-oct-2020", "nombre":"documento.txt"},'+
- '{"permiso":"-rw-r-----", "propietario":3, "grupo":3,"fecha":"08-oct-2020", "nombre":"horario.pdf"},'+
- '{"permiso":"-rw-r-----", "propietario":4, "grupo":5,"fecha":"08-apr-2019", "nombre":"compilar.sh"}'+
- ']'+
- '},'+
+     '"maquinaActual": null,'+
+     '"usuarioActual": null,'+
+    '"sistema":[' +
+        '{'+
+        '"nombre":"Cliente1",'+
+        '"dirIP":"192.168.1.1",'+
+        '"usuarios":["root","jhonny","pablo","juan","daniel"],'+
+        /* Grupos: "root","jhonny","pablo","juan","daniel","amigos","trabajo" */
+        '"grupoNom":["root","jhonny","pablo","juan","daniel","amigos","trabajo"],'+
+        '"grupos":[["0"],["1"],["2"],["3"],["4"],["0","1","2"],["0","3","4"]],'+
+        '"disco":[{"permiso":"-rw-r-----", "propietario":1, "grupo":1,"fecha":"18-oct-2020", "nombre":"carta.txt"},'+
+        '{"permiso":"-rw-r-----", "propietario":2, "grupo":2,"fecha":"17-oct-2020", "nombre":"documento.txt"},'+
+        '{"permiso":"-rw-r-----", "propietario":3, "grupo":3,"fecha":"08-oct-2020", "nombre":"horario.pdf"},'+
+        '{"permiso":"-rw-r-----", "propietario":4, "grupo":5,"fecha":"08-apr-2019", "nombre":"compilar.sh"}'+
+        ']'+
+        '},'+
 
- '{'+
- '"nombre":"Cliente2",'+
- '"dirIP":"192.168.1.2",'+
- '"usuarios":["root","jhonny","pablo","andres","maria"],'+
- /* Grupos: "root","jhonny","pablo","juan","daniel","amigos","trabajo" */
- '"grupoNom":["root","jhonny","pablo","andres","maria","amigos","trabajo"],'+
- '"grupos":[["0"],["1"],["2"],["3"],["4"],["0","1","2"],["0","3","4"]],'+
- '"disco":[{"permiso":"-rw-r-----", "propietario":1, "grupo":1,"fecha":"27-jan-2020", "nombre":"carta2.txt"},'+
- '{"permiso":"-rw-r-----", "propietario":2, "grupo":2,"fecha":"17-feb-2020", "nombre":"documento2.txt"},'+
- '{"permiso":"-rw-r-----", "propietario":3, "grupo":3,"fecha":"30-mar-2020", "nombre":"horario2.pdf"},'+
- '{"permiso":"-rw-r-----", "propietario":4, "grupo":6,"fecha":"29-jul-2019", "nombre":"compilar2.sh"}'+
- ']'+
- '},'+
+        '{'+
+        '"nombre":"Cliente2",'+
+        '"dirIP":"192.168.1.2",'+
+        '"usuarios":["root","jhonny","pablo","andres","maria"],'+
+        /* Grupos: "root","jhonny","pablo","juan","daniel","amigos","trabajo" */
+        '"grupoNom":["root","jhonny","pablo","andres","maria","amigos","trabajo"],'+
+        '"grupos":[["0"],["1"],["2"],["3"],["4"],["0","1","2"],["0","3","4"]],'+
+        '"disco":[{"permiso":"-rw-r-----", "propietario":1, "grupo":1,"fecha":"27-jan-2020", "nombre":"carta2.txt"},'+
+        '{"permiso":"-rw-r-----", "propietario":2, "grupo":2,"fecha":"17-feb-2020", "nombre":"documento2.txt"},'+
+        '{"permiso":"-rw-r-----", "propietario":3, "grupo":3,"fecha":"30-mar-2020", "nombre":"horario2.pdf"},'+
+        '{"permiso":"-rw-r-----", "propietario":4, "grupo":6,"fecha":"29-jul-2019", "nombre":"compilar2.sh"}'+
+        ']'+
+        '},'+
 
- '{'+
- '"nombre":"Cliente3",'+
- '"dirIP":"192.168.1.3",'+
- '"usuarios":["root","jhonny","pablo","camilo","miguel"],'+
- /* Grupos: "root","jhonny","pablo","juan","daniel","amigos","trabajo" */
- '"grupoNom":["root","jhonny","pablo","camilo","miguel","amigos","trabajo"],'+
- '"grupos":[["0"],["1"],["2"],["3"],["4"],["0","1","2"],["0","3","4"]],'+
- '"disco":[{"permiso":"-rw-r-----", "propietario":1, "grupo":1,"fecha":"27-jun-2018", "nombre":"carta3.txt"},'+
- '{"permiso":"-rw-r-----", "propietario":2, "grupo":2,"fecha":"03-feb-2018", "nombre":"documento3.txt"},'+
- '{"permiso":"-rw-r-----", "propietario":3, "grupo":3,"fecha":"07-dic-2019", "nombre":"horario3.pdf"},'+
- '{"permiso":"-rw-r-----", "propietario":4, "grupo":5,"fecha":"29-aug-2019", "nombre":"compilar3.sh"}'+
- ']'+
- '},'+
+        '{'+
+        '"nombre":"Cliente3",'+
+        '"dirIP":"192.168.1.3",'+
+        '"usuarios":["root","jhonny","pablo","camilo","miguel"],'+
+        /* Grupos: "root","jhonny","pablo","juan","daniel","amigos","trabajo" */
+        '"grupoNom":["root","jhonny","pablo","camilo","miguel","amigos","trabajo"],'+
+        '"grupos":[["0"],["1"],["2"],["3"],["4"],["0","1","2"],["0","3","4"]],'+
+        '"disco":[{"permiso":"-rw-r-----", "propietario":1, "grupo":1,"fecha":"27-jun-2018", "nombre":"carta3.txt"},'+
+        '{"permiso":"-rw-r-----", "propietario":2, "grupo":2,"fecha":"03-feb-2018", "nombre":"documento3.txt"},'+
+        '{"permiso":"-rw-r-----", "propietario":3, "grupo":3,"fecha":"07-dic-2019", "nombre":"horario3.pdf"},'+
+        '{"permiso":"-rw-r-----", "propietario":4, "grupo":5,"fecha":"29-aug-2019", "nombre":"compilar3.sh"}'+
+        ']'+
+        '},'+
 
- '{'+
- '"nombre":"Cliente4",'+
- '"dirIP":"192.168.1.4",'+
- '"usuarios":["root","jhonny","pablo","nestor","carlos"],'+
- /* Grupos: "root","jhonny","pablo","juan","daniel","amigos","trabajo" */
- '"grupoNom":["root","jhonny","pablo","nestor","carlos","amigos","trabajo"],'+
- '"grupos":[["0"],["1"],["2"],["3"],["4"],["0","1","2"],["0","3","4"]],'+
- '"disco":[{"permiso":"-rw-r-----", "propietario":1, "grupo":1,"fecha":"05-mar-2010", "nombre":"carta4.txt"},'+
- '{"permiso":"-rw-r-----", "propietario":2, "grupo":2,"fecha":"03-feb-2009", "nombre":"documento4.txt"},'+
- '{"permiso":"-rw-r-----", "propietario":3, "grupo":3,"fecha":"07-dic-2020", "nombre":"horario4.pdf"},'+
- '{"permiso":"-rw-r-----", "propietario":4, "grupo":6,"fecha":"29-aug-2016", "nombre":"compilar4.sh"}'+
- ']'+
- '}'+
+        '{'+
+        '"nombre":"Cliente4",'+
+        '"dirIP":"192.168.1.4",'+
+        '"usuarios":["root","jhonny","pablo","nestor","carlos"],'+
+        /* Grupos: "root","jhonny","pablo","juan","daniel","amigos","trabajo" */
+        '"grupoNom":["root","jhonny","pablo","nestor","carlos","amigos","trabajo"],'+
+        '"grupos":[["0"],["1"],["2"],["3"],["4"],["0","1","2"],["0","3","4"]],'+
+        '"disco":[{"permiso":"-rw-r-----", "propietario":1, "grupo":1,"fecha":"05-mar-2010", "nombre":"carta4.txt"},'+
+        '{"permiso":"-rw-r-----", "propietario":2, "grupo":2,"fecha":"03-feb-2009", "nombre":"documento4.txt"},'+
+        '{"permiso":"-rw-r-----", "propietario":3, "grupo":3,"fecha":"07-dic-2020", "nombre":"horario4.pdf"},'+
+        '{"permiso":"-rw-r-----", "propietario":4, "grupo":6,"fecha":"29-aug-2016", "nombre":"compilar4.sh"}'+
+        ']'+
+    '}'+
 
  ']}'; 
 
@@ -191,9 +191,9 @@
  * Borra (limpia) todo el contenido de la consola (ver HTML)
  */
  function limpiarConsola() {
-  document.getElementById( "textoImprimir" ).innerHTML = ""
-  document.getElementById( "entrada" ).value           = "";
-  //alert(objMaquinas.maquinas[1].Nombre + " " + objMaquinas.maquinas[1].dirIP);
+    document.getElementById( "textoImprimir" ).innerHTML = ""
+    document.getElementById( "entrada" ).value           = "";
+    //alert(objMaquinas.maquinas[1].Nombre + " " + objMaquinas.maquinas[1].dirIP);
 }
 
 /**
@@ -201,7 +201,7 @@
  * @param texto Texto que se desea adicionar al final de la consola.
  */
  function addConsola ( texto ) {
-  document.getElementById( "textoImprimir" ).innerHTML += texto + "<br>";
+    document.getElementById( "textoImprimir" ).innerHTML += texto + "<br>";
 }
 
 
@@ -522,6 +522,19 @@ function procesarChown(archivo, propietarioGrupo) {
     }
 }
 
+
+function procesarChmod(permiso, archivo) {
+    var indiceMaquina = consultarIndiceMaquina(objSistema.maquinaActual);
+    var indiceArchivo = consultarIndiceArchivo(archivo);
+
+    if (buscarArchivo(archivo)){
+        objSistema.sistema[indiceMaquina].disco[indiceArchivo].permiso = "-" + permisosChmod[permiso.charAt(0)] + permisosChmod[permiso.charAt(1)] + permisosChmod[permiso.charAt(2)];
+        addConsola("chmod: Se cambiaron los permisos del archivo " + archivo);
+    }else{
+        addConsola("bash: chmod: " + " El archivo no existe");
+    }
+
+}
 /**
  * Funcion que permite listar un con ls los archivos del disco
  */
@@ -617,12 +630,36 @@ function procesarListarLs() {
                         addConsola ( "bash: El comando chown necesita parametros" );
                     }
                 } else if(comandoParametros[1] == "chmod"){
-
+                    if (isNaN(comandoParametros[2]) == false) {
+                        if (comandoParametros[2].length==3) {
+                            procesarChmod(comandoParametros[2], comandoParametros[3]);
+                        } else {
+                            addConsola ( "bash: chmod: El permiso no es válido" );
+                        }
+                    } else {
+                        addConsola ( "bash: chmod: Se necesita números como parametro" );
+                    }
                 }
             }else{
                 addConsola ( "bash: El comando sudo necesita parametros" );
             }
             break;
+
+        case 'nano':
+            if (comandoParametros[1] != null) {
+                procesarNano(comandoParametros[1]);    
+            }else{
+                addConsola ( "bash: El comando nano necesita un parametro" );
+            }
+            break;
+
+        case 'rm':
+            if (comandoParametros[1] != null) {
+                procesarRm(comandoParametros[1]);    
+            }else{
+                addConsola ( "bash: El comando rm necesita un parametro" );
+            }
+            break;            
 
         default:
             addConsola ( "bash: comando no reconocido: " + comandoParametros[0] );
@@ -631,6 +668,73 @@ function procesarListarLs() {
     //addConsola ( "" );
     document.getElementById( "entrada" ).value = "";
 }
+
+function procesarNano (archivo) {
+
+    var indiceUsuario = consultarIndiceUsuario(objSistema.usuarioActual);
+    var indiceMaquina = consultarIndiceMaquina(objSistema.maquinaActual);
+    var indiceArchivo = consultarIndiceArchivo(archivo);
+
+    if (buscarArchivo(archivo)) {
+        var propietario = objSistema.sistema[indiceMaquina].disco[indiceArchivo].propietario;
+        var permiso = objSistema.sistema[indiceMaquina].disco[indiceArchivo].permiso;
+        var grupo = objSistema.sistema[indiceMaquina].disco[indiceArchivo].grupo;
+
+        if (propietario == indiceUsuario) {
+            if (verificarPermisosUsuarioW(permiso)) {
+                addConsola("nano: Escribiendo el archivo " + archivo + " ...");
+            } else {
+                addConsola("nano: No tiene permisos para escribir el archivo " + archivo );
+            }
+        }else{
+            if (verificarPermisosEscritura(indiceMaquina, indiceUsuario, grupo, permiso)) {
+                addConsola("nano: Escribiendo el archivo " + archivo + " ...");  
+            } else {
+                addConsola("nano: No tiene permiso para escribir el archivo " + archivo);
+            } 
+        }
+
+    } else {
+     addConsola("nano: El archivo " + archivo + " no existe"); 
+    }
+}
+
+/**
+ * Metodo para procesar la eliminacion de archivos con rm
+ * @param {} archivo 
+ */
+function procesarRm (archivo) {
+
+    var indiceUsuario = consultarIndiceUsuario(objSistema.usuarioActual);
+    var indiceMaquina = consultarIndiceMaquina(objSistema.maquinaActual);
+    var indiceArchivo = consultarIndiceArchivo(archivo);
+
+    if (buscarArchivo(archivo)) {
+        var propietario = objSistema.sistema[indiceMaquina].disco[indiceArchivo].propietario;
+        var permiso = objSistema.sistema[indiceMaquina].disco[indiceArchivo].permiso;
+        var grupo = objSistema.sistema[indiceMaquina].disco[indiceArchivo].grupo;
+
+        if (propietario == indiceUsuario) {
+            if (verificarPermisosUsuarioW(permiso)) {
+                objSistema.sistema[indiceMaquina].disco.splice(indiceArchivo, 1);
+                addConsola("rm: Se removio el archivo  " + archivo);
+            } else {
+                addConsola("rm: No tiene permisos para escribir el archivo " + archivo );
+            }
+        }else{
+            if (verificarPermisosEscritura(indiceMaquina, indiceUsuario, grupo, permiso)) {
+                objSistema.sistema[indiceMaquina].disco.splice(indiceArchivo, 1);
+                addConsola("rm: Se removio el archivo " + archivo);  
+            } else {
+                addConsola("rm: No tiene permiso para escribir el archivo " + archivo);
+            } 
+        }
+
+    } else {
+     addConsola("rm: El archivo " + archivo + " no existe"); 
+    }
+}
+
 
 /**
  * Procesa el comando (clear)
