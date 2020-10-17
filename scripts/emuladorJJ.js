@@ -5,7 +5,7 @@
  licence GNU General Public License  Ver. 3.0 (GNU GPL v3)
  date Octubre 2020
  version 1.1
- modificado por: Jhonny Sierra Parra, Juan Pablo Grisales
+ modificado por: Jhonny Sierra Parra, Juan Pablo Grisales, Miguel Medina
  */
 
 /*
@@ -29,7 +29,9 @@
  var sistema = '{'+
      '"maquinaActual": null,'+
      '"usuarioActual": null,'+
-    '"sistema":[' +
+     '"maquinaAnterior": null,'+
+     '"usuarioAnterior": null,'+
+     '"sistema":[' +
         '{'+
         '"nombre":"Cliente1",'+
         '"dirIP":"192.168.1.1",'+
@@ -154,7 +156,6 @@
             $('#loginDiv').hide();
             loginMensaje.innerHTML = "";
             textoLogin.value = "";
-            //loginDiv.style.display = 'none';
 
             entrada.focus();
             prontLogin.innerHTML = objSistema.usuarioActual + "@"+ objSistema.maquinaActual + " $";
@@ -171,12 +172,31 @@
  * Funcion que permite cerrar la sesion
  */
  function cerrarSesion() {
-    $('#loginDiv').show();
-    objSistema.maquinaActual = null;
-    objSistema.usuarioActual = null;
-    limpiarDivComandos();
-    $('#divComandos').hide();
-    foco();
+    if (objSistema.maquinaAnterior == null && objSistema.usuarioAnterior == null) {
+        $('#loginDiv').show();
+        objSistema.maquinaActual = null;
+        objSistema.usuarioActual = null;
+        limpiarDivComandos();
+        $('#divComandos').hide();
+        foco();
+    } else {
+        // Se actualizan los datos de maquina actual con los de la anterior
+        objSistema.maquinaActual = objSistema.maquinaAnterior;
+        objSistema.usuarioActual = objSistema.usuarioAnterior;
+
+        objSistema.maquinaAnterior = null;
+        objSistema.usuarioAnterior = null;
+
+        // Se actualizan los datos mostrados en la consola
+        entrada.disabled = false;
+        $('#divComandos').show();
+        $('#loginDiv').hide();
+        loginMensaje.innerHTML = "";
+        textoLogin.value = "";
+        limpiarDivComandos();
+        entrada.focus();
+        prontLogin.innerHTML = objSistema.usuarioActual + "@"+ objSistema.maquinaActual + " $";
+    }
 }
 
 /**
@@ -214,8 +234,7 @@
         textoLogin.focus();
     } else {
         entrada.focus();
-    }
-    
+    }   
 }
 
 /**
@@ -223,7 +242,7 @@
  *
  * @param      {<type>}  maquina  The maquina
  * @return     {<type>}  { description_of_the_return_value }
- objSistema.sistema[x].nombre*/
+ */
  function consultarIndiceMaquina(maquina) {
     for (x in objSistema.sistema) {
         if (objSistema.sistema[x].nombre == maquina) {
@@ -588,6 +607,79 @@ function procesarEjecutar(archivo) {
     }  
 }
 
+
+/**
+ * Funcion para obtener el nombre de una maquina ingresando su IP
+ *
+ * @param      {<type>}  ipMaquina  Direccion IP de la maquina
+ * @return     {<type>}  Nombre de la maquina
+ */
+function consultarNomMaquinaPorIP(ipMaquina) {
+    for (x in objSistema.sistema) {
+        if (objSistema.sistema[x].dirIP == ipMaquina) {
+            return objSistema.sistema[x].nombre;
+            break;
+        }
+    }
+    return null;
+}
+
+
+/**
+ * Funcion que permite saber si un usuario existe o no en una maquina del sistema
+ *
+ * @param      {<type>}   indiceMaquina  Indice de la maquina
+ * @param      {<type>}   usuario        Nombre del usuario a buscar
+ * @return     {boolean}  True si encuentra en usuario en la maquina, false si no
+ */
+function buscarUsuarioEnMaquina(indiceMaquina, usuario) {
+    for (x in objSistema.sistema[indiceMaquina].usuarios) {
+            if (objSistema.sistema[indiceMaquina].usuarios[x] == usuario) {
+                return true;
+            }
+        }
+    return false;
+}
+
+/**
+ * Funcion que permite realizar una conexion ssh a otra maquina
+ *
+ * @param      {string}  usuario    Nombre del usuario con el que se quiere loguear en la maquina
+ * @param      {string}  ipMaquina  Direccion IP de la maquina a la que se quiere conectar
+ */
+function procesarSsh(usuario, ipMaquina) {
+
+    var nombreMaquina = consultarNomMaquinaPorIP(ipMaquina);
+
+    if (nombreMaquina != null) {
+        var indiceMaquina = consultarIndiceMaquina(nombreMaquina);
+        if (buscarUsuarioEnMaquina(indiceMaquina, usuario)) {
+            // Se guardan los datos de la maquina anterior
+            objSistema.maquinaAnterior = objSistema.maquinaActual;
+            objSistema.usuarioAnterior = objSistema.usuarioActual;
+
+            // Se actualizan los datos de la maquina actual
+            objSistema.maquinaActual = nombreMaquina;
+            objSistema.usuarioActual = usuario;
+
+            // Se actualiza en promt
+            entrada.disabled = false;
+            $('#divComandos').show();
+            $('#loginDiv').hide();
+            loginMensaje.innerHTML = "";
+            textoLogin.value = "";
+
+            entrada.focus();
+            prontLogin.innerHTML = objSistema.usuarioActual + "@"+ objSistema.maquinaActual + " $";
+
+        } else {
+            addConsola("ssh: Permisos denegados para: " + usuario + "@"+ ipMaquina + ": Por favor intente de nuevo");
+        }
+    } else {
+        addConsola("ssh: No se puede conectar al host: " + ipMaquina + ": No existe la ruta");
+    }
+}
+
 /**
  * Funcion que permite procesar comando ls
  */
@@ -645,7 +737,7 @@ function procesarComando ( comando ) {
                 procesarClear( comandoParametros );
                 break;
 
-            case 'logout':
+            case 'exit':
                 cerrarSesion();
                 break;
 
@@ -718,6 +810,15 @@ function procesarComando ( comando ) {
                     procesarRm(comandoParametros[1]);    
                 }else{
                     addConsola ( "bash: El comando rm necesita un parametro" );
+                }
+                break;
+
+            case 'ssh':
+                datosMaquinaSsh = comandoParametros[1].split("@");
+                if (datosMaquinaSsh.length == 2) {
+                    procesarSsh(datosMaquinaSsh[0], datosMaquinaSsh[1]);
+                } else {
+                    addConsola ( "ssh: Faltan algunos parametros: " + datosMaquinaSsh );
                 }
                 break;
 
