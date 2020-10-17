@@ -690,9 +690,26 @@ function procesarScp(usuario, ipMaquina, archivo) {
 
         if (buscarUsuarioEnMaquina(indiceMaquina, usuario)) {
             if (buscarArchivo(archivo)) {
-
+                var indiceUsuario = consultarIndiceUsuario(usuario);
+                var indiceArchivo = consultarIndiceArchivo(archivo);
+                var propietario = objSistema.sistema[indiceMaquina].disco[indiceArchivo].propietario;
                 var permiso = objSistema.sistema[indiceMaquina].disco[indiceArchivo].permiso;
-                
+                var grupo = objSistema.sistema[indiceMaquina].disco[indiceArchivo].grupo;
+
+                if (propietario == indiceUsuario) {
+                    if (verificarPermisosUsuarioR(permiso)) {
+                        // No entiendo eso de ArchivoD, lo que yo haria seria pegar la linea para hacer push al JSON
+                    } else {
+                        if (verificarPermisosEjecucion(indiceMaquina, indiceUsuario, grupo, permiso)) {
+                            
+                        }else{
+                            addConsola("bash: ./: " + " El usuario no tiene permisos de lectura");
+                        }
+                    }
+                } else {
+
+                }
+
             } else {
                 addConsola("scp: " + archivo + " : No existe el archivo o el directorio");
             }
