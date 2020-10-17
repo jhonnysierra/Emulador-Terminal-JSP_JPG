@@ -172,6 +172,7 @@
  * Funcion que permite cerrar la sesion
  */
  function cerrarSesion() {
+    //Valida si exista una sesion anterior
     if (objSistema.maquinaAnterior == null && objSistema.usuarioAnterior == null) {
         $('#loginDiv').show();
         objSistema.maquinaActual = null;
@@ -677,6 +678,31 @@ function procesarSsh(usuario, ipMaquina) {
         }
     } else {
         addConsola("ssh: No se puede conectar al host: " + ipMaquina + ": No existe la ruta");
+    }
+}
+
+
+function procesarScp(usuario, ipMaquina, archivo) {
+    var nombreMaquina = consultarNomMaquinaPorIP(ipMaquina);
+
+    if (nombreMaquina != null) {
+        var indiceMaquina = consultarIndiceMaquina(nombreMaquina);
+
+        if (buscarUsuarioEnMaquina(indiceMaquina, usuario)) {
+            if (buscarArchivo(archivo)) {
+
+                var permiso = objSistema.sistema[indiceMaquina].disco[indiceArchivo].permiso;
+                
+            } else {
+                addConsola("scp: " + archivo + " : No existe el archivo o el directorio");
+            }
+            
+                
+        } else {
+            addConsola("ssh: Permisos denegados para: " + usuario + "@"+ ipMaquina + ": Por favor intente de nuevo");
+        }
+    } else {
+        addConsola("scp: No se puede conectar al host: " + ipMaquina + ": No existe la ruta");
     }
 }
 
