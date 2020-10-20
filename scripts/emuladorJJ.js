@@ -269,7 +269,23 @@
         }
     }
     return false;
-}
+ }
+
+ /**
+ * Verifica si existe un archivo en el disco de la maquina en especifico
+ *
+ * @param      {String}   archivo  Nombre del archivo
+ * @return     {boolean}  { description_of_the_return_value }
+ */
+function buscarArchivoMaquina(archivo,indiceMaquina) {
+    
+    for (x in objSistema.sistema[indiceMaquina].disco) {
+        if (objSistema.sistema[indiceMaquina].disco[x].nombre == archivo) {
+            return true;
+        }
+    }
+    return false;
+ }
 
 /**
  * Funcion para consultar el indice de un archivo en el arreglo de disco de la maquina
@@ -289,6 +305,16 @@
     return null;
 }
 
+function consultarIndiceArchivo(archivo,indiceMaquina) {
+
+    for (x in objSistema.sistema[indiceMaquina].disco) {
+        console.log(objSistema.sistema[indiceMaquina].disco[x]);
+        if (objSistema.sistema[indiceMaquina].disco[x].nombre == archivo) {
+            return x;
+        }
+    }
+    return null;
+}
 /**
  * Funcion para consultar el indice de un usuarios en la maquina actual
  *
@@ -307,6 +333,16 @@
     return null;
 }
 
+function consultarIndiceUsuario(usuario,indiceMaquina) {
+
+    for (x in objSistema.sistema[indiceMaquina].usuarios) {
+        if (objSistema.sistema[indiceMaquina].usuarios[x] == usuario) {
+            return x;
+            break;
+        }
+    }
+    return null;
+}
 /**
  * Consulta el indice del grupo
  *
@@ -681,33 +717,58 @@ function procesarSsh(usuario, ipMaquina) {
     }
 }
 
-
-function procesarScp(usuario, ipMaquina, archivo) {
+/**
+ * Metodo para procesar el comando scp cuando se quiere traer un archivo de otra maquina
+ * @param {*} usuario 
+ * @param {*} ipMaquina 
+ * @param {*} archivo 
+ * @param {*} nombrenuevo 
+ */
+function procesarScpRecibir(usuario, ipMaquina, archivo, nombrenuevo) {
     var nombreMaquina = consultarNomMaquinaPorIP(ipMaquina);
+    var indiceMaquinaAct = consultarIndiceMaquina(objSistema.maquinaActual);
 
     if (nombreMaquina != null) {
         var indiceMaquina = consultarIndiceMaquina(nombreMaquina);
 
         if (buscarUsuarioEnMaquina(indiceMaquina, usuario)) {
-            if (buscarArchivo(archivo)) {
-                var indiceUsuario = consultarIndiceUsuario(usuario);
-                var indiceArchivo = consultarIndiceArchivo(archivo);
+
+            if (buscarArchivoMaquina(archivo,indiceMaquina)) {
+                
+                var indiceUsuario = consultarIndiceUsuario(usuario,indiceMaquina);
+                var indiceArchivo = consultarIndiceArchivo(archivo,indiceMaquina);
                 var propietario = objSistema.sistema[indiceMaquina].disco[indiceArchivo].propietario;
                 var permiso = objSistema.sistema[indiceMaquina].disco[indiceArchivo].permiso;
                 var grupo = objSistema.sistema[indiceMaquina].disco[indiceArchivo].grupo;
 
-                if (propietario == indiceUsuario) {
+                if (propietario != indiceUsuario) {
                     if (verificarPermisosUsuarioR(permiso)) {
-                        // No entiendo eso de ArchivoD, lo que yo haria seria pegar la linea para hacer push al JSON
+                        if(nombrenuevo=='.'){
+                            objSistema.sistema[indiceMaquinaAct].disco.push({"permiso":permiso, "propietario":propietario, "grupo":grupo,"fecha":"08-apr-2019", "nombre":archivo});
+
+                            addConsola("bash: scp " + " Copiando Archivo: " + archivo);
+                        }else{
+                            objSistema.sistema[indiceMaquinaAct].disco.push({"permiso":permiso, "propietario":propietario, "grupo":grupo,"fecha":"08-apr-2019", "nombre":nombrenuevo});
+                            addConsola("bash: scp " + " Copiando Archivo: " + archivo);
+                        }
+
                     } else {
                         if (verificarPermisosEjecucion(indiceMaquina, indiceUsuario, grupo, permiso)) {
+
+                            if(nombrenuevo=='.'){
+                                objSistema.sistema[indiceMaquinaAct].disco.push({"permiso":permiso, "propietario":propietario, "grupo":usuario,"fecha":"08-apr-2019", "nombre":archivo});
+                                addConsola("bash: scp " + " Copiando Archivo: " + archivo);
+                            }else{
+                                objSistema.sistema[indiceMaquinaAct].disco.push({"permiso":permiso, "propietario":propietario, "grupo":usuario,"fecha":"08-apr-2019", "nombre":nombrenuevo});
+                                addConsola("bash: scp " + " Copiando Archivo: " + archivo);
+                            }
                             
                         }else{
-                            addConsola("bash: ./: " + " El usuario no tiene permisos de lectura");
+                            addConsola("bash: scp " + " El usuario no tiene permisos de lectura");
                         }
                     }
                 } else {
-
+                    addConsola("bash: scp " + " El usuario no puede copiar un archivo a el mismo");
                 }
 
             } else {
@@ -716,7 +777,73 @@ function procesarScp(usuario, ipMaquina, archivo) {
             
                 
         } else {
-            addConsola("ssh: Permisos denegados para: " + usuario + "@"+ ipMaquina + ": Por favor intente de nuevo");
+            addConsola("scp: El usuario no existe");
+        }
+    } else {
+        addConsola("scp: No se puede conectar al host: " + ipMaquina + ": No existe la ruta");
+    }
+}
+
+/**
+ * procesa el comando para copiar un archivo desde una maquina local a una remota
+ * @param {*} usuario 
+ * @param {*} ipMaquina 
+ * @param {*} archivo 
+ * @param {*} nombrenuevo 
+ */
+function procesarScpEnviar(usuario, ipMaquina, archivo, nombrenuevo) {
+    var nombreMaquina = consultarNomMaquinaPorIP(ipMaquina);
+
+    if (nombreMaquina != null) {
+        var indiceMaquina = consultarIndiceMaquina(nombreMaquina);
+
+        if (buscarUsuarioEnMaquina(indiceMaquina, usuario)) {
+
+            if (buscarArchivo(archivo)) {
+
+                var indiceUsuario = consultarIndiceUsuario(usuario);
+                var indiceArchivo = consultarIndiceArchivo(archivo);
+                var propietario = objSistema.sistema[indiceMaquina].disco[indiceArchivo].propietario;
+                var permiso = objSistema.sistema[indiceMaquina].disco[indiceArchivo].permiso;
+                var grupo = objSistema.sistema[indiceMaquina].disco[indiceArchivo].grupo;
+
+                if (propietario != indiceUsuario) {
+                    if (verificarPermisosUsuarioR(permiso)) {
+                        if(nombrenuevo=='.'){
+                            objSistema.sistema[indiceMaquina].disco.push({"permiso":permiso, "propietario":propietario, "grupo":grupo,"fecha":"08-apr-2019", "nombre":archivo});
+
+                            addConsola("bash: scp " + " Copiando Archivo: " + archivo);
+                        }else{
+                            objSistema.sistema[indiceMaquina].disco.push({"permiso":permiso, "propietario":propietario, "grupo":grupo,"fecha":"08-apr-2019", "nombre":nombrenuevo});
+                            addConsola("bash: scp " + " Copiando Archivo: " + archivo);
+                        }
+
+                    } else {
+                        if (verificarPermisosEjecucion(indiceMaquina, indiceUsuario, grupo, permiso)) {
+
+                            if(nombrenuevo=='.'){
+                                objSistema.sistema[indiceMaquina].disco.push({"permiso":permiso, "propietario":propietario, "grupo":usuario,"fecha":"08-apr-2019", "nombre":archivo});
+                                addConsola("bash: scp " + " Copiando Archivo: " + archivo);
+                            }else{
+                                objSistema.sistema[indiceMaquina].disco.push({"permiso":permiso, "propietario":propietario, "grupo":usuario,"fecha":"08-apr-2019", "nombre":nombrenuevo});
+                                addConsola("bash: scp " + " Copiando Archivo: " + archivo);
+                            }
+                            
+                        }else{
+                            addConsola("bash: scp " + " El usuario no tiene permisos de lectura");
+                        }
+                    }
+                } else {
+                    addConsola("bash: scp " + " El usuario no puede copiar un archivo a el mismo");
+                }
+
+            } else {
+                addConsola("scp: " + archivo + " : No existe el archivo o el directorio");
+            }
+            
+                
+        } else {
+            addConsola("scp: Permisos denegados para: " + usuario + "@"+ ipMaquina + ": Por favor intente de nuevo");
         }
     } else {
         addConsola("scp: No se puede conectar al host: " + ipMaquina + ": No existe la ruta");
@@ -834,6 +961,8 @@ function procesarComando ( comando ) {
                         } else {
                             addConsola ( "bash: chmod: Se necesita números como parametro" );
                         }
+                    }else{
+                        addConsola ( "bash: El comando sudo no reconoce el parametro" );    
                     }
                 }else{
                     addConsola ( "bash: El comando sudo necesita parametros" );
@@ -864,6 +993,31 @@ function procesarComando ( comando ) {
                     addConsola ( "ssh: Faltan algunos parametros: " + datosMaquinaSsh );
                 }
                 break;
+            
+            case 'scp':
+
+                if (comandoParametros[1]!=null){
+
+                    if (comandoParametros[1].includes('@')){
+                       
+                        var usuarioO = comandoParametros[1].split("@")
+                        var ipO = usuarioO[1].split(":") 
+                               
+                        procesarScpRecibir(usuarioO[0],ipO[0],ipO[1],comandoParametros[2])
+
+                    }else{
+                        
+                        var usuarioD = comandoParametros[2].split("@")
+                        var ipD = usuarioD[1].split(":") 
+                                
+                        procesarScpEnviar(usuarioD[0],ipD[0],comandoParametros[1],ipD[1])  
+                    }
+
+                }else {
+                    addConsola ( "scp: Faltan algunos parametros " )
+                }
+                break;
+
 
             default:
                 addConsola ( "bash: comando no reconocido: " + comandoParametros[0] );
