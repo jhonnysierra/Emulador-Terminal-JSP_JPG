@@ -305,6 +305,7 @@ function buscarArchivoMaquina(archivo,indiceMaquina) {
     return null;
 }
 
+/*
 function consultarIndiceArchivo(archivo,indiceMaquina) {
 
     for (x in objSistema.sistema[indiceMaquina].disco) {
@@ -315,6 +316,9 @@ function consultarIndiceArchivo(archivo,indiceMaquina) {
     }
     return null;
 }
+*/
+
+
 /**
  * Funcion para consultar el indice de un usuarios en la maquina actual
  *
@@ -323,6 +327,8 @@ function consultarIndiceArchivo(archivo,indiceMaquina) {
  */
  function consultarIndiceUsuario(usuario) {
     var indiceMaquina = consultarIndiceMaquina(objSistema.maquinaActual);
+    console.log(usuario);
+    console.log(indiceMaquina);
 
     for (x in objSistema.sistema[indiceMaquina].usuarios) {
         if (objSistema.sistema[indiceMaquina].usuarios[x] == usuario) {
@@ -333,7 +339,9 @@ function consultarIndiceArchivo(archivo,indiceMaquina) {
     return null;
 }
 
-function consultarIndiceUsuario(usuario,indiceMaquina) {
+/*
+function consultarIndiceUsuario(usuario, indiceMaquina) {
+    console.log(usuario);
 
     for (x in objSistema.sistema[indiceMaquina].usuarios) {
         if (objSistema.sistema[indiceMaquina].usuarios[x] == usuario) {
@@ -343,6 +351,8 @@ function consultarIndiceUsuario(usuario,indiceMaquina) {
     }
     return null;
 }
+*/
+
 /**
  * Consulta el indice del grupo
  *
