@@ -305,8 +305,8 @@ function buscarArchivoMaquina(archivo,indiceMaquina) {
     return null;
 }
 
-/*
-function consultarIndiceArchivo(archivo,indiceMaquina) {
+
+function consultarIndiceArchivo2(archivo,indiceMaquina) {
 
     for (x in objSistema.sistema[indiceMaquina].disco) {
         console.log(objSistema.sistema[indiceMaquina].disco[x]);
@@ -316,7 +316,7 @@ function consultarIndiceArchivo(archivo,indiceMaquina) {
     }
     return null;
 }
-*/
+
 
 
 /**
@@ -339,8 +339,8 @@ function consultarIndiceArchivo(archivo,indiceMaquina) {
     return null;
 }
 
-/*
-function consultarIndiceUsuario(usuario, indiceMaquina) {
+
+function consultarIndiceUsuario2(usuario, indiceMaquina) {
     console.log(usuario);
 
     for (x in objSistema.sistema[indiceMaquina].usuarios) {
@@ -351,7 +351,7 @@ function consultarIndiceUsuario(usuario, indiceMaquina) {
     }
     return null;
 }
-*/
+
 
 /**
  * Consulta el indice del grupo
@@ -745,8 +745,8 @@ function procesarScpRecibir(usuario, ipMaquina, archivo, nombrenuevo) {
 
             if (buscarArchivoMaquina(archivo,indiceMaquina)) {
                 
-                var indiceUsuario = consultarIndiceUsuario(usuario,indiceMaquina);
-                var indiceArchivo = consultarIndiceArchivo(archivo,indiceMaquina);
+                var indiceUsuario = consultarIndiceUsuario2(usuario,indiceMaquina);
+                var indiceArchivo = consultarIndiceArchivo2(archivo,indiceMaquina);
                 var propietario = objSistema.sistema[indiceMaquina].disco[indiceArchivo].propietario;
                 var permiso = objSistema.sistema[indiceMaquina].disco[indiceArchivo].permiso;
                 var grupo = objSistema.sistema[indiceMaquina].disco[indiceArchivo].grupo;
